@@ -58,7 +58,6 @@
     </div>
     <div class="form-group">
         <button class="btn btn-primary" @onclick="SaveSupplier">Save</button>
-        <button class="btn btn-light" @onclick="Cancel">Cancel</button>
     </div>
 </EditForm>
 @code {
@@ -81,16 +80,11 @@
     {
         if (supplier.SupplierID != 0)
         {
-           supplierRepository.Update(supplier);
+            supplierRepository.Update(supplier);
         }
         else
         {
             supplier = supplierRepository.Save(supplier);
         }
-        Cancel();
-    }
-    public void Cancel()
-    {
-        NavigationManager.NavigateTo("/");
     }
 }
