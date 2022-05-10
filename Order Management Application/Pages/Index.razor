@@ -1,0 +1,112 @@
+﻿@page "/"
+@using Order_Management_Application.Data;
+@inject Order_Management_Application.IRepository.ISupplierRepository supplierRepository;
+
+<h1>Order Management Application</h1>
+<div class="row">
+    <div class="col-md-6">
+        <a href='/supplier/add' class="btn btn-primary" role="button">
+            <i class="fas fa-user-plus"></i>
+            Add Supplier
+        </a>
+    </div>
+    <div class="input-group col">
+        <input type="text" class="form-control" placeholder="Search supplier by name"
+               @bind="SearchString" @bind:event="oninput" @onkeyup="FilterSupplier" />
+       @if (SearchString.Length > 0)
+        {
+            <div class="input-group-append">
+                <button class="btn btn-danger" @onclick="ResetSearch">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        }
+    </div>
+</div>
+<br />
+@if (supplierList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped align-middle table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th>SupplierName</th>
+                <th>AddressLine1</th>
+                <th>AddressLine2</th>
+                <th>City</th>
+                <th>PostalCode</th>
+                <th>State</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var supplier in supplierList)
+            {
+                <tr>
+                    <td>@supplier.SupplierName</td>
+                    <td>@supplier.AddressLine1</td>
+                    <td>@supplier.AddressLine2</td>
+                    <td>@supplier.City</td>
+                    <td>@supplier.PostalCode</td>
+                    <td>@supplier.State</td>
+                    <td>
+                        <a href='/supplier/view/@supplier.SupplierID' class="btn btn-outline-primary" role="button">
+                            View
+                        </a>
+                        <a href='/supplier/edit/@supplier.SupplierID' class="btn btn-outline-dark" role="button">
+                            Edit
+                        </a>
+                        <a href='/supplier/delete/@supplier.SupplierID' class="btn btn-outline-danger" role="button">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+            @if(supplierList.Count == 0)
+            {
+                <tr>
+                    <td class="text-center" colspan="7">No record found</td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
+@code {
+    List<Supplier> supplierList = new List<Supplier>();
+
+    protected override void OnInitialized()
+    {
+        LoadSupplier();
+    }
+
+    private void LoadSupplier()
+    {
+        supplierList = supplierRepository.Gets();
+        searchSupplierData = supplierList;
+    }
+    protected List<Supplier> searchSupplierData = new List<Supplier>();
+    protected string SearchString { get; set; } = string.Empty;
+   
+    protected void FilterSupplier()
+    {
+        if (!string.IsNullOrEmpty(SearchString))
+        {
+            supplierList = searchSupplierData
+                .Where(x => x.SupplierName.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) != -1)
+                .ToList();
+        }
+        else
+        {
+            supplierList = searchSupplierData;
+        }
+    }
+    public void ResetSearch()
+    {
+        SearchString = string.Empty;
+        supplierList = searchSupplierData;
+    }
+}
